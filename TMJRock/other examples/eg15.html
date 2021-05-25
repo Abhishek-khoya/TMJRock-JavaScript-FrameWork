@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <title>AJAX Examples</title>
+    <style>
+        .modalMask
+        {
+            width : 100%;
+            height : 100%;
+            top : 0;
+            left : 0;
+            border : 1px solid red;
+            background : grey;
+            position : fixed;
+            opacity : 70%;
+        }
+        .modal
+        {
+            width : 600px;
+            min-width : 600px;
+            height : 300px;
+            min-height : 300px;
+            background : white;
+            position : fixed;
+            top : 0;
+            left : 0;
+            bottom : 0;
+            right : 0;
+            margin : auto;
+            border : 3px solid white;
+        }
+        .closeButton
+        {
+            float : right;
+            padding : 2px 4px;
+            cursor : pointer;
+            margin-right : 7px;
+            margin-top : 2px;
+            font-size : 14pt;
+            color: aliceblue;
+        }
+        </style>
+        <script> 
+        var ds={
+            "modals" : []
+        };
+        var $$$={
+            "modals" : {}
+        };
+        $$$.modals.show=function(mid)
+        {
+            alert(mid); 
+            for(var i=0;i<=ds.modals.length;i++)
+            {
+                if(ds.modals[i].getContentId()==mid) return ds.modals[i];
+            }
+        }
+        $$$.modals.show=function(mid)
+        {
+            var modal=null;
+            for(var i=0;i<=ds.modals.length;i++)
+            {
+                if(ds.modals[i].getContentId()==mid) 
+                {
+                    modal=ds.modals[i];
+                    break;
+                }
+            }
+            if(modal==null) return;
+            modal.show();
+        }
+            function Modal(cref)
+            {
+                var objectAddress=this;
+                //some property that can be used to decide if the modal should 
+                //be closed if the user clicks outside the modal area
+                this.afterOpening=null;
+                this.beforeOpening=null;
+                this.afterClosing=null;
+                this.beforeClosing=null;
+                var contentReference=cref;
+                this.getContentId=function(){
+                    return contentReference.id;
+                };
+                var contentParentReference=contentReference.parentElement;
+                var contentIndex=0;
+                while(contentIndex<contentParentReference.children.length) 
+                {
+                    if(contentReference==contentParentReference.children[contentIndex])
+                    {
+                        break;
+                    }
+                    contentIndex++;
+                }
+                var modalMaskDivision=document.createElement("div");
+                modalMaskDivision.style.display="none";
+                modalMaskDivision.classList.add("modalMask");
+                var modalDivision=document.createElement("div");
+                modalDivision.style.display="none"
+                modalDivision.classList.add("modal");
+                document.body.appendChild(modalMaskDivision);
+                document.body.appendChild(modalDivision);
+                var headerDivision=document.createElement("div");
+                headerDivision.style.background="#2C3E50";
+                headerDivision.style.width="98.8";
+                headerDivision.style.height="40px"; 
+                headerDivision.style.padding="5px"
+                headerDivision.style.borderBottom="solid black";
+                modalDivision.appendChild(headerDivision);
+                if(contentReference.hasAttribute("size"))
+                {
+                    var sz=contentReference.getAttribute("size");
+                    var sz=contentReference.getAttribute("size");
+                    let xpos=sz.indexOf("x");
+                    if(xpos==-1) xpos=indexOf("X");
+                    if(xpos==-1) throw "In case of modal size should be specified as widthxheight";
+                    if(xpos==0 || xpos==sz.length-1) throw "In case of modal size should be specified as widthxheight";
+                    let width=sz.substring(0,xpos);
+                    let height=sz.substring(xpos+1);
+                    modalDivision.style.width=width+"px";
+                    modalDivision.style.height=height+"px";
+                    modalDivision.style.border="solid black";
+                    modalDivision.style.padding="2px";
+                    
+                }
+                else
+                {
+                    modalDivision.style.width="300px";
+                    modalDivision.style.height="300px";
+                }
+                if(contentReference.hasAttribute("header"))
+                {
+                    var hd=contentReference.getAttribute("header");
+                    headerDivision.innerHTML=hd;
+                }
+                if(contentReference.hasAttribute("maskColour"))
+                {
+                    var mkc=contentReference.getAttribute("maskColour");
+                    modalMaskDivision.style.background=mkc;
+                }
+                if(contentReference.hasAttribute("modalBackgroundColour"))
+                {
+                    var mbc=contentReference.getAttribute("modalBackgroundColour");
+                    modalDivision.style.background=mbc;
+                }
+                var contentDivision=document.createElement("div");
+                //contentDivision.style.border="1px solid black";
+                contentDivision.style.height=(modalDivision.style.height.substring(0,modalDivision.style.height.length-2)-130)+"px";
+                contentDivision.style.width="98%";
+                contentDivision.style.overflow="auto";
+                contentDivision.style.padding="5px";
+                contentReference.remove();
+                contentDivision.appendChild(contentReference);
+                contentReference.style.display='block';
+                contentReference.style.visibility='visible';
+                modalDivision.appendChild(contentDivision);
+                var footerDivision=document.createElement("div");
+                footerDivision.style.background="#2C3E50";
+                footerDivision.style.left="0";
+                footerDivision.style.right="0";
+                footerDivision.style.height="40px";
+                footerDivision.style.padding="5px"
+                footerDivision.style.position="absolute";
+                footerDivision.style.bottom="0";
+                footerDivision.style.borderTop="solid black"
+                modalDivision.appendChild(footerDivision);
+                if(contentReference.hasAttribute("footer"))
+                {
+                    var ft=contentReference.getAttribute("footer");
+                    footerDivision.innerHTML=ft;
+                }
+                var closeButtonSpan=null;
+                if(contentReference.hasAttribute("closeButton"))
+                {
+                    var cb=contentReference.getAttribute("closeButton");
+                    if(cb.toUpperCase()=="TRUE")
+                    {
+                        var closeButtonSpan=document.createElement("span");
+                        closeButtonSpan.classList.add("closeButton");                        
+                        var closeButtonMarker=document.createTextNode("X");
+                        closeButtonSpan.appendChild(closeButtonMarker);
+                        headerDivision.appendChild(closeButtonSpan);        
+                    }
+                }
+                if(contentReference.hasAttribute("afterOpening"))
+                {
+                    var oo=contentReference.getAttribute("afterOpening");
+                    this.afterOpening=oo;
+                }
+
+                if(contentReference.hasAttribute("beforeOpening"))
+                {
+                    var oo=contentReference.getAttribute("beforeOpening");
+                    this.beforeOpening=oo;
+                }
+
+                if(contentReference.hasAttribute("afterClosing"))
+                {
+                    var oc=contentReference.getAttribute("afterClosing");
+                    this.afterClosing=oc;
+                }
+
+                if(contentReference.hasAttribute("beforeClosing"))
+                {
+                    var oc=contentReference.getAttribute("beforeClosing");
+                    this.beforeClosing=oc;
+                }
+                    this.show=function(){
+                    let openModal=true;
+                    if(this.beforeOpening)
+                    {
+                        openModal=eval(objectAddress.beforeOpening);
+                    }
+                    if(openModal)
+                    {
+                        modalMaskDivision.style.display="block";
+                        modalDivision.style.display="block";
+                    if(this.afterOpening) setTimeout(function(){eval(objectAddress.afterOpening)},100);
+                    }
+                };
+                var objectAddress=this;
+                if(closeButtonSpan!=null)
+                {
+                closeButtonSpan.onclick=function(){
+                    let closeModal=true;
+                    if(objectAddress.beforeClosing)
+                    {
+                        closeModal=eval(objectAddress.beforeClosing);
+                    }
+                    if(closeModal)
+                    {
+                      modalDivision.style.display="none";
+                      modalMaskDivision.style.display="none";
+                      if(objectAddress.afterClosing) setTimeout(function(){eval(objectAddress.afterClosing)},100);
+                    }
+                }
+                }
+            }
+            function abBeforeOpening()
+            {
+                alert("Modal with ab is about to be opened");
+                return true;
+            }
+            function abOpened()
+            {
+                alert("Modal with ab opened");
+            }
+            function abBeforeClosing()
+            {
+                alert("Modal with ab is about to be closed");
+                return true;
+            }
+            function abClosed()
+            {
+                alert("Modal with ab closed");
+            }
+
+            function createModal()
+            {
+                $$$.modals.show("ab");
+            };
+            function loader()
+            {
+                var all=document.getElementsByTagName("*");
+                var i;
+                for(i=0;i<all.length;i++)
+                {
+                    if(all[i].hasAttribute("forModal")) 
+                    { 
+                        if(all[i].getAttribute("forModal").toUpperCase()=="TRUE")
+                        {
+                            all[i].setAttribute("forModal","false");
+                            ds.modals[ds.modals.length]=new Modal(all[i]);
+                            i--;
+                        }
+                    }
+                }
+            }
+            function xyz()
+            {
+                var xx=document.getElementById("myTextBox");
+                alert(xx); 
+            }
+            window.addEventListener('load',loader);
+            </script>
+   </head>
+<body>
+   <center><button onclick='createModal()'>Show Modal</button></center>
+   <div id='ab' style='display:none' forModal='true' size="600x300" header="Some heading" footer="Some footer" maskColour="#17202A" modalBackgroundColour="#FDFEFE" closeButton='true' beforeOpening="abBeforeOpening()" afterOpening="abOpened()" beforeClosing="abBeforeClosing()" afterClosing="abClosed()">
+       <input type='text' id='myTextBox' value='great'><br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       </div>
+       <button onclick="xyz()">Cool button</button>
+</body> 
+</html>

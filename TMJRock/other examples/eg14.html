@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <title>AJAX Examples</title>
+    <style>
+        .modalMask
+        {
+            width : 100%;
+            height : 100%;
+            top : 0;
+            left : 0;
+            border : 1px solid red;
+            background : grey;
+            position : fixed;
+            opacity : 70%;
+        }
+        .modal
+        {
+            width : 600px;
+            min-width : 600px;
+            height : 300px;
+            min-height : 300px;
+            background : white;
+            position : fixed;
+            top : 0;
+            left : 0;
+            bottom : 0;
+            right : 0;
+            margin : auto;
+            border : 3px solid white;
+        }
+        .closeButton
+        {
+            float : right;
+            padding : 2px 4px;
+            cursor : pointer;
+            margin-right : 7px;
+            margin-top : 2px;
+            font-size : 14pt;
+        }
+        </style>
+        <script> 
+        var ds={
+            "modals" : []
+        };
+        var $$$={
+            "modals" : {}
+        };
+        $$$.modals.show=function(mid)
+        {
+            alert(mid); 
+            for(var i=0;i<=ds.modals.length;i++)
+            {
+                if(ds.modals[i].getContentId()==mid) return ds.modals[i];
+            }
+        }
+        $$$.modals.show=function(mid)
+        {
+            var modal=null;
+            for(var i=0;i<=ds.modals.length;i++)
+            {
+                if(ds.modals[i].getContentId()==mid) 
+                {
+                    modal=ds.modals[i];
+                    break;
+                }
+            }
+            if(modal==null) return;
+            modal.show();
+        }
+            function Modal(cref)
+            {
+                var objectAddress=this;
+                //some property that can be used to decide if the modal should 
+                //be closed if the user clicks outside the modal area
+                this.onOpen=null;
+                this.onClose=null;
+                var contentReference=cref;
+                this.getContentId=function(){
+                    return contentReference.id;
+                };
+                var contentParentReference=contentReference.parentElement;
+                var contentIndex=0;
+                while(contentIndex<contentParentReference.children.length) 
+                {
+                    if(contentReference==contentParentReference.children[contentIndex])
+                    {
+                        break;
+                    }
+                    contentIndex++;
+                }
+                var modalMaskDivision=document.createElement("div");
+                modalMaskDivision.classList.add("modalMask");
+                var modalDivision=document.createElement("div");
+                modalDivision.classList.add("modal");
+                var headerDivision=document.createElement("div");
+                headerDivision.style.background="red";
+                headerDivision.style.width="98.8";
+                headerDivision.style.height="40px"; 
+                headerDivision.style.padding="5px"
+                modalDivision.appendChild(headerDivision);
+                if(contentReference.hasAttribute("size"))
+                {
+                    var sz=contentReference.getAttribute("size");
+                    var sz=contentReference.getAttribute("size");
+                    let xpos=sz.indexOf("x");
+                    if(xpos==-1) xpos=indexOf("X");
+                    if(xpos==-1) throw "In case of modal size should be specified as widthxheight";
+                    if(xpos==0 || xpos==sz.length-1) throw "In case of modal size should be specified as widthxheight";
+                    let width=sz.substring(0,xpos);
+                    let height=sz.substring(xpos+1);
+                    modalDivision.style.width=width+"px";
+                    modalDivision.style.height=height+"px";
+                }
+                else
+                {
+                    modalDivision.style.width="300px";
+                    modalDivision.style.height="300px";
+                }
+                if(contentReference.hasAttribute("header"))
+                {
+                    var hd=contentReference.getAttribute("header");
+                    headerDivision.innerHTML=hd;
+                }
+                if(contentReference.hasAttribute("maskColour"))
+                {
+                    var mkc=contentReference.getAttribute("maskColour");
+                    modalMaskDivision.style.background=mkc;
+                }
+                if(contentReference.hasAttribute("modalBackgroundColour"))
+                {
+                    var mbc=contentReference.getAttribute("modalBackgroundColour");
+                    modalDivision.style.background=mbc;
+                }
+                var contentDivision=document.createElement("div");
+                //contentDivision.style.border="1px solid black";
+                contentDivision.style.height=(modalDivision.style.height.substring(0,modalDivision.style.height.length-2)-130)+"px";
+                contentDivision.style.width="98%";
+                contentDivision.style.overflow="auto";
+                contentDivision.style.padding="5px";
+                contentReference.remove();
+                contentDivision.appendChild(contentReference);
+                modalDivision.appendChild(contentDivision);
+                var footerDivision=document.createElement("div");
+                footerDivision.style.background="pink";
+                footerDivision.style.left="0";
+                footerDivision.style.right="0";
+                footerDivision.style.height="40px";
+                footerDivision.style.padding="5px"
+                footerDivision.style.position="absolute";
+                footerDivision.style.bottom="0";
+                modalDivision.appendChild(footerDivision);
+                if(contentReference.hasAttribute("footer"))
+                {
+                    var ft=contentReference.getAttribute("footer");
+                    footerDivision.innerHTML=ft;
+                }
+                var closeButtonSpan=null;
+                if(contentReference.hasAttribute("closeButton"))
+                {
+                    var cb=contentReference.getAttribute("closeButton");
+                    if(cb.toUpperCase()=="TRUE")
+                    {
+                        var closeButtonSpan=document.createElement("span");
+                        closeButtonSpan.classList.add("closeButton");                        
+                        var closeButtonMarker=document.createTextNode("X");
+                        closeButtonSpan.appendChild(closeButtonMarker);
+                        headerDivision.appendChild(closeButtonSpan);        
+                    }
+                }
+                if(contentReference.hasAttribute("onOpen"))
+                {
+                    var oo=contentReference.getAttribute("onOpen");
+                    this.onOpen=oo;
+                }
+                if(contentReference.hasAttribute("onClose"))
+                {
+                    var oc=contentReference.getAttribute("onClose");
+                    this.onClose=oc;
+                }
+                    this.show=function(){
+                    document.body.appendChild(modalMaskDivision);
+                    document.body.appendChild(modalDivision);
+                    if(this.onOpen) setTimeout(function(){eval(objectAddress.onOpen)},100);
+                };
+                var objectAddress=this;
+                if(closeButtonSpan!=null)
+                {
+                closeButtonSpan.onclick=function(){
+                    modalDivision.remove();
+                    modalMaskDivision.remove();
+                    if(objectAddress.onClose) setTimeout(function(){eval(objectAddress.onClose)},100);
+                }
+                }
+            }
+            function abOpened()
+            {
+                alert("Modal with ab opened");
+            }
+            function abClosed()
+            {
+                alert("Modal with ab closed");
+            }
+
+            function createModal1()
+            {
+                $$$.modals.show("ab");
+            };
+            function createModal2()
+            {
+                $$$("pq").onOpen=function(){
+                    alert("Modal with pq opened");
+                };
+                $$$("pq").onClose=function(){
+                    alert("Modal with pq closed");
+                };
+                $$$.modals.show("pq");
+            };
+            function loader()
+            {
+                var all=document.getElementsByTagName("*");
+                var i;
+                for(i=0;i<all.length;i++)
+                {
+                    if(all[i].hasAttribute("forModal")) 
+                    { 
+                        if(all[i].getAttribute("forModal").toUpperCase()=="TRUE")
+                        {
+                            ds.modals[ds.modals.length]=new Modal(all[i]);
+                            i--;
+                        }
+                    }
+                }
+            }
+            window.addEventListener('load',loader);
+            </script>
+   </head>
+<body>
+   <button onclick='createModal1()'>Show Modal 1</button>
+   <button onclick='createModal2()'>Show Modal 2</button>
+   <div id='ab' forModal='true' size="800x400" header="Some heading" footer="Some footer" maskColour="#3355ff" modalBackgroundColour="#549933" closeButton='true' onOpen=abOpened() onClose=abClosed()>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       God is great<br>
+       </div>
+       <div id='pq' forModal='true'>
+           Ujjain is the city of Gods
+           </div>
+</body> 
+</html>

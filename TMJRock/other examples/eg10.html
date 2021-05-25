@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <title>AJAX Examples</title>
+    <style>
+        .xyz
+        {
+            width : 100%;
+            height : 100%;
+            top : 0;
+            left : 0;
+            border : 1px solid red;
+            background : grey;
+            position : fixed;
+            opacity : 70%;
+        }
+        .pqr
+        {
+            width : 600px;
+            min-width : 600px;
+            height : 300px;
+            min-height : 300px;
+            background : white;
+            position : fixed;
+            top : 0;
+            left : 0;
+            bottom : 0;
+            right : 0;
+            margin : auto;
+            border : 3px solid white;
+            overflow : auto;
+        }
+        .lmn
+        {
+            float : right;
+            padding : 2px 4px;
+            cursor : pointer;
+        }
+        </style>
+        <script>
+            function showModal()
+            {
+                var d=document.createElement("div");
+                d.classList.add("xyz");
+                document.body.appendChild(d);
+                var p=document.createElement("div");
+                p.classList.add("pqr");
+                document.body.appendChild(p);
+                var s=document.createElement("span");
+                s.classList.add("lmn")
+                var t=document.createTextNode("X");
+                s.appendChild(t);
+                p.appendChild(s);
+            }
+            </script>
+   </head>
+<body>
+   <button onclick='showModal()'>Show Modal</button>
+</body> 
+</html>
